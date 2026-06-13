@@ -1,0 +1,50 @@
+services:
+  - type: web
+    name: atomberg-backend
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: cd backend && npm install && npm run build
+    startCommand: cd backend && npm run start:prod
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: LIVEKIT_API_KEY
+        sync: false
+      - key: LIVEKIT_API_SECRET
+        sync: false
+      - key: LIVEKIT_WS_URL
+        sync: false
+      - key: REDIS_HOST
+        fromService:
+          type: redis
+          name: atomberg-redis
+          property: host
+      - key: REDIS_PORT
+        fromService:
+          type: redis
+          name: atomberg-redis
+          property: port
+      - key: MINIO_ENDPOINT
+        value: minio
+      - key: MINIO_PORT
+        value: 9000
+      - key: MINIO_ACCESS_KEY
+        value: minioadmin
+      - key: MINIO_SECRET_KEY
+        value: minioadmin
+      - key: MINIO_BUCKET
+        value: atomberg
+    healthCheckPath: /
+
+  - type: redis
+    name: atomberg-redis
+    region: oregon
+    plan: free
+    maxmemoryPolicy: noeviction
