@@ -22,16 +22,8 @@ services:
         value: secret
       - key: LIVEKIT_WS_URL
         value: ws://localhost:7880
-      - key: REDIS_HOST
-        fromService:
-          type: redis
-          name: atomberg-redis
-          property: host
-      - key: REDIS_PORT
-        fromService:
-          type: redis
-          name: atomberg-redis
-          property: port
+      - key: REDIS_URL
+        value: rediss://default:gQAAAAAAAc6ZAAIgcDJhOTZhYTNhMjg3ZmE0ZjU2ODg3MzliNTE3MWUzNjg3MQ@knowing-deer-118425.upstash.io:6379
       - key: MINIO_ENDPOINT
         value: localhost
       - key: MINIO_PORT
@@ -47,9 +39,3 @@ services:
       - key: FRONTEND_URL
         sync: false
     healthCheckPath: /
-
-  - type: redis
-    name: atomberg-redis
-    region: oregon
-    plan: free
-    maxmemoryPolicy: noeviction

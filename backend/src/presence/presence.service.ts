@@ -17,22 +17,15 @@ export class PresenceService implements OnModuleInit {
 
   async onModuleInit() {
     try {
-      const redisConfig: any = {
-        socket: {
-          host: process.env.REDIS_HOST || 'localhost',
-          port: parseInt(process.env.REDIS_PORT) || 6379,
-        },
-      };
-
-      // Add TLS support for Upstash
-      if (process.env.REDIS_TLS === 'true') {
-        redisConfig.socket.tls = true;
-      }
-
-      // Add password if provided
-      if (process.env.REDIS_PASSWORD) {
-        redisConfig.password = process.env.REDIS_PASSWORD;
-      }
+      const redisUrl = process.env.REDIS_URL;
+      const redisConfig: any = redisUrl
+        ? { url: redisUrl }
+        : {
+            socket: {
+              host: process.env.REDIS_HOST || 'localhost',
+              port: parseInt(process.env.REDIS_PORT) || 6379,
+            },
+          };
 
       this.redis = createClient(redisConfig) as RedisClientType;
       await this.redis.connect();
