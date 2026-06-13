@@ -19,7 +19,7 @@ interface MeetingRequest {
 export default function SessionsPage() {
   const router = useRouter();
   const { user } = useAuthStore();
-  const [sessions, setSessions] = useState([]);
+  const [sessions, setSessions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [joiningId, setJoiningId] = useState<string | null>(null);
   const [manualToken, setManualToken] = useState('');
