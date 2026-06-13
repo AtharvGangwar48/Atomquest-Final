@@ -5,7 +5,8 @@
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:prod": "node dist/main",
-    "build": "nest build"
+    "build": "nest build",
+    "seed:admin": "node seed-admin.js"
   },
   "dependencies": {
     "@livekit/protocol": "^1.46.6",

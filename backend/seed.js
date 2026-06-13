@@ -69,15 +69,15 @@ async function seed() {
 
   try {
     admin = await post('/auth/register', {
-      email: 'admin@demo.com',
-      password: 'password123',
+      email: 'admin-vcp@atomquest.com',
+      password: 'admin123',
       name: 'Admin User',
       role: 'agent',
     });
-    console.log('  ✅ Admin: admin@demo.com\n');
+    console.log('  ✅ Admin: admin-vcp@atomquest.com (Note: Manually set role to admin in DB)\n');
   } catch (err) {
     if (err.message.includes('already exists')) {
-      admin = await post('/auth/login', { email: 'admin@demo.com', password: 'password123' });
+      admin = await post('/auth/login', { email: 'admin-vcp@atomquest.com', password: 'admin123' });
       console.log('  ✅ Admin exists (logged in)\n');
     } else throw err;
   }
@@ -136,10 +136,12 @@ async function seed() {
   console.log('✅ SEED COMPLETE!\n');
   console.log('📋 DEMO CREDENTIALS');
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-  console.log('Agent:    agent@demo.com    / password123');
-  console.log('Customer: customer@demo.com / password123');
-  console.log('Admin:    admin@demo.com    / password123');
+  console.log('Agent:    agent@demo.com           / password123');
+  console.log('Customer: customer@demo.com        / password123');
+  console.log('Admin:    admin-vcp@atomquest.com  / admin123');
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  console.log('\n⚠️  IMPORTANT: Update admin role manually in database:');
+  console.log('   UPDATE "user" SET role = \'admin\', "isVerified" = true WHERE email = \'admin-vcp@atomquest.com\';\n');
   console.log('\n🌐 URLS');
   console.log('App:       http://localhost:3000');
   console.log('Admin:     http://localhost:3000/admin');

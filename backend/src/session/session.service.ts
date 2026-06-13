@@ -136,6 +136,22 @@ export class SessionService {
     };
   }
 
+  async getAgentCustomers(agentId: string) {
+    const sessions = await this.sessionRepo.find({
+      where: { agentId },
+      relations: ['customer'],
+    });
+    const seen = new Set<string>();
+    const customers: { id: string; name: string; email: string }[] = [];
+    for (const s of sessions) {
+      if (s.customer && !seen.has(s.customer.id)) {
+        seen.add(s.customer.id);
+        customers.push({ id: s.customer.id, name: s.customer.name, email: s.customer.email });
+      }
+    }
+    return customers;
+  }
+
   private async logEvent(sessionId: string, eventType: string, metadata: any) {
     const event = this.eventRepo.create({ sessionId, eventType, metadata });
     await this.eventRepo.save(event);

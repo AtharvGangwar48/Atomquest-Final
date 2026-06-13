@@ -14,8 +14,17 @@ export class User {
   @Column()
   name: string;
 
-  @Column({ type: 'enum', enum: ['agent', 'customer'], default: 'customer' })
-  role: 'agent' | 'customer';
+  @Column({ type: 'enum', enum: ['agent', 'customer', 'admin'], default: 'customer' })
+  role: 'agent' | 'customer' | 'admin';
+
+  @Column({ nullable: true })
+  employeeId?: string;
+
+  @Column({ default: false })
+  isVerified: boolean;
+
+  @Column({ default: true })
+  isActive: boolean;
 
   @CreateDateColumn()
   createdAt: Date;

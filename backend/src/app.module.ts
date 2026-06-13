@@ -9,6 +9,9 @@ import { AdminModule } from './admin/admin.module';
 import { MetricsModule } from './metrics/metrics.module';
 import { PresenceModule } from './presence/presence.module';
 import { StorageModule } from './storage/storage.module';
+import { MeetingRequestModule } from './meeting-request/meeting-request.module';
+import { NotificationModule } from './notification/notification.module';
+import { ScheduledSessionModule } from './scheduled-session/scheduled-session.module';
 
 const getDatabaseConfig = () => {
   if (process.env.DATABASE_URL) {
@@ -55,6 +58,9 @@ const getDatabaseConfig = () => {
     MetricsModule,
     PresenceModule,
     StorageModule,
+    MeetingRequestModule,
+    NotificationModule,
+    ScheduledSessionModule,
   ],
 })
 export class AppModule {}

@@ -4,7 +4,8 @@ interface User {
   id: string;
   email: string;
   name: string;
-  role: 'agent' | 'customer';
+  role: 'agent' | 'customer' | 'admin';
+  isVerified?: boolean;
 }
 
 interface AuthStore {

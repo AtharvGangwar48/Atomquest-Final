@@ -54,4 +54,10 @@ export class SessionController {
   async getParticipants(@Param('id') id: string) {
     return this.presenceService.getParticipants(id);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('agent/customers')
+  async getAgentCustomers(@Req() req) {
+    return this.sessionService.getAgentCustomers(req.user.id);
+  }
 }

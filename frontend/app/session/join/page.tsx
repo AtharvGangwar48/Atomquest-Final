@@ -13,12 +13,15 @@ export default function JoinSession() {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    const token = searchParams.get('token');
+
     if (!user) {
+      // Save token so we can resume after login
+      if (token) localStorage.setItem('pendingJoinToken', token);
       router.push('/');
       return;
     }
 
-    const token = searchParams.get('token');
     if (token) {
       handleJoin(token);
     } else {
