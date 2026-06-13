@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/store/auth';
 import api from '@/lib/api';
 
-export default function JoinSession() {
+function JoinSessionContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const user = useAuthStore((s) => s.user);
@@ -68,5 +68,13 @@ export default function JoinSession() {
         ) : null}
       </div>
     </div>
+  );
+}
+
+export default function JoinSession() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gradient-to-br from-blue-600 to-purple-600" />}>
+      <JoinSessionContent />
+    </Suspense>
   );
 }
