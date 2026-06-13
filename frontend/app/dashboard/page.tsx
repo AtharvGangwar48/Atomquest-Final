@@ -152,7 +152,7 @@ export default function Dashboard() {
                 <h1 className="text-4xl sm:text-5xl font-bold">
                   {mounted && user?.name ? user.name : 'Agent'}
                 </h1>
-                <BadgeCheck className="w-9 h-9 text-blue-300 shrink-0" title="Verified Agent" />
+                <BadgeCheck className="w-9 h-9 text-blue-300 shrink-0" />
               </div>
               <p className="text-blue-100 text-lg">Welcome back! Here's your support overview.</p>
             </div>
