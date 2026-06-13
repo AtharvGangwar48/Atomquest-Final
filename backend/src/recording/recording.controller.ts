@@ -12,9 +12,9 @@ export class RecordingController {
 
   @UseGuards(JwtAuthGuard)
   @Post('start')
-  async startRecording(@Body('sessionId') sessionId: string) {
-    const session = await this.sessionService.getSession(sessionId);
-    return this.recordingService.startRecording(sessionId, session?.roomName || '');
+  async startRecording(@Body() body: { sessionId: string }) {
+    const session = await this.sessionService.getSession(body.sessionId);
+    return this.recordingService.startRecording(body.sessionId, session?.roomName || '');
   }
 
   @UseGuards(JwtAuthGuard)

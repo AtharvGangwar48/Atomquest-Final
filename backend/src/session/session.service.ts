@@ -62,7 +62,7 @@ export class SessionService {
       await this.sessionRepo.save(session);
     }
 
-    const livekitToken = this.livekitService.generateToken(
+    const livekitToken = await this.livekitService.generateToken(
       session.roomName,
       userName || userId,
       JSON.stringify({ userId, userName, role: 'customer' }),
@@ -120,7 +120,7 @@ export class SessionService {
       await this.sessionRepo.save(session);
     }
 
-    const livekitToken = this.livekitService.generateToken(
+    const livekitToken = await this.livekitService.generateToken(
       session.roomName,
       userName || userId,
       JSON.stringify({ userId, userName, role: 'agent' }),

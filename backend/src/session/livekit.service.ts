@@ -7,12 +7,15 @@ export class LivekitService {
   private apiSecret = process.env.LIVEKIT_API_SECRET || 'secret';
   private wsUrl = process.env.LIVEKIT_WS_URL || 'ws://localhost:7880';
 
-  generateToken(roomName: string, participantName: string, metadata?: string) {
+  async generateToken(roomName: string, participantName: string, metadata?: string) {
+    console.log('Generating token with:', { apiKey: this.apiKey, apiSecret: this.apiSecret });
     if (!this.apiKey || !this.apiSecret) {
-      console.error('LiveKit credentials missing!');
+      throw new Error('LiveKit credentials missing!');
     }
+    const identity = `${participantName}-${Math.random().toString(36).substr(2, 9)}`;
     const at = new AccessToken(this.apiKey, this.apiSecret, {
-      identity: participantName,
+      identity,
+      name: participantName,
       metadata,
     });
     at.addGrant({ 
@@ -22,11 +25,12 @@ export class LivekitService {
       canPublishData: true,
       canSubscribe: true 
     });
-    return at.toJwt();
+    const token = await at.toJwt();
+    console.log('Token generated successfully:', token.substring(0, 50));
+    return token;
   }
 
   getWsUrl() {
-    console.log('LiveKit WS URL:', this.wsUrl);
     return this.wsUrl;
   }
 

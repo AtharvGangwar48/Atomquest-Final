@@ -1,194 +1,232 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth';
 import api from '@/lib/api';
 
-function fmt(sec: number) {
-  const m = Math.floor(sec / 60), s = sec % 60;
-  return `${m}m ${s}s`;
-}
-
-function StatusBadge({ status }: { status: string }) {
-  const colors: Record<string, string> = {
-    active: 'bg-green-100 text-green-800',
-    ended: 'bg-gray-100 text-gray-600',
-    recording: 'bg-red-100 text-red-700',
-    processing: 'bg-yellow-100 text-yellow-700',
-    ready: 'bg-blue-100 text-blue-700',
-  };
-  return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${colors[status] || 'bg-gray-100 text-gray-600'}`}>{status}</span>;
-}
-
-export default function AdminDashboard() {
+export default function AdminPage() {
   const router = useRouter();
   const { user, logout } = useAuthStore();
-  const [data, setData] = useState<any>(null);
+  const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'active' | 'history'>('active');
-  const [ending, setEnding] = useState<string | null>(null);
-
-  const load = useCallback(async () => {
-    try {
-      const res = await api.get('/admin/dashboard');
-      setData(res.data);
-    } catch {}
-    finally { setLoading(false); }
-  }, []);
 
   useEffect(() => {
-    if (!user) { router.push('/'); return; }
-    load();
-    const t = setInterval(load, 5000);
-    return () => clearInterval(t);
-  }, [user, load]);
+    if (!user) {
+      router.push('/');
+      return;
+    }
+    loadSessions();
+    const interval = setInterval(loadSessions, 3000);
+    return () => clearInterval(interval);
+  }, [user]);
 
-  const forceEnd = async (sessionId: string) => {
-    if (!confirm('Force end this session?')) return;
-    setEnding(sessionId);
+  const loadSessions = async () => {
     try {
-      await api.post(`/admin/sessions/${sessionId}/end`);
-      await load();
-    } catch { alert('Failed'); }
-    finally { setEnding(null); }
+      const { data } = await api.get('/admin/dashboard');
+      setSessions(data.sessions || []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" /></div>;
+  const endSession = async (sessionId: string) => {
+    if (!confirm('End this session?')) return;
+    try {
+      await api.post(`/admin/sessions/${sessionId}/end`);
+      await loadSessions();
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Failed to end session');
+    }
+  };
 
-  const stats = data?.stats || {};
-  const active: any[] = data?.activeSessions || [];
-  const history: any[] = data?.historicalSessions || [];
+  const handleLogout = () => {
+    logout();
+    router.push('/');
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm border-b">
+      {/* Header */}
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <div>
-            <h1 className="text-xl font-bold text-gray-900">Admin Dashboard</h1>
-            <p className="text-xs text-gray-500">SupportVision Operations</p>
+            <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+            <p className="text-gray-600 mt-1">System monitoring & management</p>
           </div>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600">{user?.name}</span>
-            <button onClick={logout} className="text-sm text-red-600 hover:text-red-700">Logout</button>
-          </div>
+          <button
+            onClick={handleLogout}
+            className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition font-medium"
+          >
+            Logout
+          </button>
         </div>
-      </nav>
+      </header>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Stats */}
-        <div className="grid grid-cols-3 gap-4 mb-8">
-          {[
-            { label: 'Total Sessions', value: stats.total || 0, color: 'text-blue-600' },
-            { label: 'Active Now', value: stats.active || 0, color: 'text-green-600' },
-            { label: 'Ended', value: stats.ended || 0, color: 'text-gray-600' },
-          ].map((s) => (
-            <div key={s.label} className="bg-white p-6 rounded-xl shadow-sm border">
-              <div className={`text-3xl font-bold ${s.color}`}>{s.value}</div>
-              <div className="text-sm text-gray-500 mt-1">{s.label}</div>
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-6 py-12">
+        {/* Live Sessions */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 mb-8">
+          <div className="p-6 border-b border-gray-200">
+            <h2 className="text-2xl font-bold text-gray-900">Live Sessions</h2>
+            <p className="text-gray-600 text-sm mt-1">
+              {sessions.filter((s: any) => s.status === 'active').length} active now
+            </p>
+          </div>
+
+          {loading ? (
+            <div className="p-12 text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading sessions...</p>
             </div>
-          ))}
+          ) : sessions.filter((s: any) => s.status === 'active').length === 0 ? (
+            <div className="p-12 text-center">
+              <p className="text-gray-500">No active sessions</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gray-200 bg-gray-50">
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
+                      Session ID
+                    </th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
+                      Agent
+                    </th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
+                      Customer
+                    </th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
+                      Duration
+                    </th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sessions
+                    .filter((s: any) => s.status === 'active')
+                    .map((session: any) => {
+                      const duration = Math.floor(
+                        (Date.now() - new Date(session.createdAt).getTime()) / 1000
+                      );
+                      const mins = Math.floor(duration / 60);
+                      const secs = duration % 60;
+
+                      return (
+                        <tr
+                          key={session.id}
+                          className="border-b border-gray-200 hover:bg-gray-50 transition"
+                        >
+                          <td className="px-6 py-4 text-sm font-mono text-gray-700">
+                            {session.roomName?.substring(0, 12)}...
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-700">
+                            {session.agent?.name}
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-700">
+                            {session.customer?.name || '—'}
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-700">
+                            {mins}m {secs}s
+                          </td>
+                          <td className="px-6 py-4 text-sm">
+                            <button
+                              onClick={() => endSession(session.id)}
+                              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition text-xs font-medium"
+                            >
+                              End
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
 
-        {/* Tabs */}
-        <div className="flex gap-1 mb-4 bg-gray-200 p-1 rounded-lg w-fit">
-          {(['active', 'history'] as const).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`px-6 py-2 rounded-md text-sm font-medium transition ${activeTab === tab ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}
-            >
-              {tab === 'active' ? `Active Sessions (${active.length})` : `History (${history.length})`}
-            </button>
-          ))}
+        {/* Session History */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200">
+          <div className="p-6 border-b border-gray-200">
+            <h2 className="text-2xl font-bold text-gray-900">All Sessions</h2>
+            <p className="text-gray-600 text-sm mt-1">Total: {sessions.length}</p>
+          </div>
+
+          {sessions.length === 0 ? (
+            <div className="p-12 text-center">
+              <p className="text-gray-500">No sessions</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gray-200 bg-gray-50">
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
+                      Session
+                    </th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
+                      Agent
+                    </th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
+                      Customer
+                    </th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
+                      Status
+                    </th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
+                      Created
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sessions.map((session: any) => (
+                    <tr
+                      key={session.id}
+                      className="border-b border-gray-200 hover:bg-gray-50 transition"
+                    >
+                      <td className="px-6 py-4 text-sm font-mono text-gray-700">
+                        {session.roomName?.substring(0, 12)}...
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-700">
+                        {session.agent?.name}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-700">
+                        {session.customer?.name || '—'}
+                      </td>
+                      <td className="px-6 py-4 text-sm">
+                        <span
+                          className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
+                            session.status === 'active'
+                              ? 'bg-green-100 text-green-700'
+                              : session.status === 'created'
+                              ? 'bg-blue-100 text-blue-700'
+                              : 'bg-gray-100 text-gray-700'
+                          }`}
+                        >
+                          {session.status === 'active'
+                            ? '🟢 Active'
+                            : session.status === 'created'
+                            ? '🟡 Waiting'
+                            : '⚫ Ended'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-700">
+                        {new Date(session.createdAt).toLocaleString()}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
-
-        {/* Active Sessions Table */}
-        {activeTab === 'active' && (
-          <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-50 border-b">
-                <tr>
-                  {['Session ID', 'Agent', 'Customer', 'Duration', 'Participants', 'Status', 'Action'].map((h) => (
-                    <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y">
-                {active.length === 0 ? (
-                  <tr><td colSpan={7} className="px-4 py-12 text-center text-gray-400">No active sessions</td></tr>
-                ) : active.map((s) => (
-                  <tr key={s.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 font-mono text-xs text-gray-500">{s.id.slice(0, 8)}…</td>
-                    <td className="px-4 py-3 font-medium">{s.agent?.name || '—'}</td>
-                    <td className="px-4 py-3 text-gray-600">{s.customer?.name || <span className="text-yellow-600 text-xs">Waiting...</span>}</td>
-                    <td className="px-4 py-3 text-gray-600">{fmt(s.durationSec)}</td>
-                    <td className="px-4 py-3">
-                      <span className="bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full text-xs">
-                        {[s.agent, s.customer].filter(Boolean).length} / 2
-                      </span>
-                    </td>
-                    <td className="px-4 py-3"><StatusBadge status={s.status} /></td>
-                    <td className="px-4 py-3">
-                      <button
-                        onClick={() => forceEnd(s.id)}
-                        disabled={ending === s.id}
-                        className="bg-red-600 text-white px-3 py-1 rounded-lg text-xs hover:bg-red-700 disabled:opacity-50"
-                      >
-                        {ending === s.id ? 'Ending...' : 'Force End'}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {/* Historical Sessions Table */}
-        {activeTab === 'history' && (
-          <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-50 border-b">
-                <tr>
-                  {['Session ID', 'Agent', 'Customer', 'Date', 'Duration', 'Chat', 'Recordings', 'Status'].map((h) => (
-                    <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y">
-                {history.length === 0 ? (
-                  <tr><td colSpan={8} className="px-4 py-12 text-center text-gray-400">No ended sessions</td></tr>
-                ) : history.map((s) => (
-                  <tr key={s.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 font-mono text-xs text-gray-500">{s.id.slice(0, 8)}…</td>
-                    <td className="px-4 py-3 font-medium">{s.agent?.name || '—'}</td>
-                    <td className="px-4 py-3 text-gray-600">{s.customer?.name || '—'}</td>
-                    <td className="px-4 py-3 text-gray-500 text-xs">{new Date(s.endedAt || s.createdAt).toLocaleString()}</td>
-                    <td className="px-4 py-3 text-gray-600">{fmt(s.durationSec)}</td>
-                    <td className="px-4 py-3">
-                      <span className="bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full text-xs">{s.chatCount} msgs</span>
-                    </td>
-                    <td className="px-4 py-3">
-                      {s.recordings.length === 0 ? (
-                        <span className="text-gray-400 text-xs">None</span>
-                      ) : s.recordings.map((r: any) => (
-                        <div key={r.id} className="flex items-center gap-1">
-                          <StatusBadge status={r.status} />
-                          {r.status === 'ready' && r.fileUrl && (
-                            <a href={r.fileUrl} target="_blank" rel="noreferrer" className="text-xs text-blue-600 hover:underline ml-1">↓ MP4</a>
-                          )}
-                        </div>
-                      ))}
-                    </td>
-                    <td className="px-4 py-3"><StatusBadge status={s.status} /></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+      </main>
     </div>
   );
 }

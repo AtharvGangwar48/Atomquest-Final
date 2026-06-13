@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/store/auth';
 import api from '@/lib/api';
-import { Loader2, AlertCircle } from 'lucide-react';
 
 export default function JoinSession() {
   const router = useRouter();
@@ -45,20 +44,20 @@ export default function JoinSession() {
       <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full">
         {joining && !error ? (
           <div className="text-center">
-            <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">Joining Session</h2>
-            <p className="text-gray-600">Please wait while we connect you...</p>
+            <p className="text-gray-600">Connecting you to the support agent...</p>
           </div>
         ) : error ? (
           <div className="text-center">
             <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <AlertCircle className="w-6 h-6 text-red-600" />
+              <span className="text-2xl">❌</span>
             </div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">Unable to Join</h2>
-            <p className="text-red-600 mb-6">{error}</p>
+            <p className="text-red-600 mb-6 text-sm">{error}</p>
             <button
               onClick={() => router.push('/sessions')}
-              className="w-full bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700 transition"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium transition"
             >
               Back to Sessions
             </button>
