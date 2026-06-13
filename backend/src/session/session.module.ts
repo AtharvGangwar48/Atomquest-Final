@@ -9,7 +9,11 @@ import { LivekitService } from './livekit.service';
 import { PresenceModule } from '../presence/presence.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Session, SessionEvent]), PresenceModule, JwtModule],
+  imports: [
+    TypeOrmModule.forFeature([Session, SessionEvent]),
+    PresenceModule,
+    JwtModule.register({ secret: process.env.JWT_SECRET || 'your-secret-key' }),
+  ],
   controllers: [SessionController],
   providers: [SessionService, LivekitService],
   exports: [SessionService, LivekitService],

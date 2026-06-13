@@ -18,31 +18,37 @@ export class SessionService {
   ) {}
 
   async createSession(agentId: string) {
+    if (!agentId) throw new Error('Agent ID is required');
+    
     const roomName = `room-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     const session = this.sessionRepo.create({
       agentId,
       roomName,
       status: 'created',
     });
-    await this.sessionRepo.save(session);
+    const savedSession = await this.sessionRepo.save(session);
 
     const joinToken = this.jwtService.sign(
-      { sessionId: session.id, role: 'customer' },
+      { sessionId: savedSession.id, role: 'customer' },
       { expiresIn: '24h' },
     );
-    session.joinToken = joinToken;
-    await this.sessionRepo.save(session);
+    savedSession.joinToken = joinToken;
+    await this.sessionRepo.save(savedSession);
 
-    await this.logEvent(session.id, 'session_created', { agentId });
+    await this.logEvent(savedSession.id, 'session_created', { agentId });
 
-    return { sessionId: session.id, joinToken, joinUrl: `/session/join?token=${joinToken}` };
+    return { 
+      sessionId: savedSession.id, 
+      joinToken, 
+      joinUrl: `/session/join?token=${joinToken}` 
+    };
   }
 
   async joinSession(token: string, userId: string, userName: string) {
     let decoded;
     try {
       decoded = this.jwtService.verify(token);
-    } catch {
+    } catch (err) {
       throw new ForbiddenException('Invalid or expired token');
     }
 
@@ -58,11 +64,11 @@ export class SessionService {
 
     const livekitToken = this.livekitService.generateToken(
       session.roomName,
-      userId,
-      JSON.stringify({ userId, userName }),
+      userName || userId,
+      JSON.stringify({ userId, userName, role: 'customer' }),
     );
 
-    await this.logEvent(session.id, 'participant_joined', { userId, userName });
+    await this.logEvent(session.id, 'participant_joined', { userId, userName, role: 'customer' });
 
     return {
       roomToken: livekitToken,
@@ -116,11 +122,11 @@ export class SessionService {
 
     const livekitToken = this.livekitService.generateToken(
       session.roomName,
-      userId,
-      JSON.stringify({ userId, userName }),
+      userName || userId,
+      JSON.stringify({ userId, userName, role: 'agent' }),
     );
 
-    await this.logEvent(sessionId, 'agent_joined', { userId, userName });
+    await this.logEvent(sessionId, 'agent_joined', { userId, userName, role: 'agent' });
 
     return {
       roomToken: livekitToken,

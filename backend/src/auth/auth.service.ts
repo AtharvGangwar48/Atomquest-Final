@@ -14,6 +14,8 @@ export class AuthService {
   ) {}
 
   async register(email: string, password: string, name: string, role: 'agent' | 'customer') {
+    const existing = await this.userRepo.findOne({ where: { email } });
+    if (existing) throw new Error('Email already exists');
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = this.userRepo.create({ email, password: hashedPassword, name, role });
     await this.userRepo.save(user);

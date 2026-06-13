@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, Query, Param, UseGuards, Req } from '@nestjs/common';
+import { Controller, Post, Get, Body, Query, Param, UseGuards, Req, BadRequestException } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { SessionService } from './session.service';
 import { PresenceService } from '../presence/presence.service';
@@ -26,8 +26,11 @@ export class SessionController {
 
   @UseGuards(JwtAuthGuard)
   @Post('join')
-  joinSession(@Body('token') token: string, @Req() req) {
-    return this.sessionService.joinSession(token, req.user.id, req.user.name);
+  joinSession(@Body() body: any, @Req() req) {
+    if (!body.token) {
+      throw new BadRequestException('Token is required');
+    }
+    return this.sessionService.joinSession(body.token, req.user.id, req.user.name);
   }
 
   @UseGuards(JwtAuthGuard)

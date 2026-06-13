@@ -1,9 +1,16 @@
-import './globals.css';
+'use client';
 
-export const metadata = {
-  title: 'SupportVision - Video Support Platform',
-  description: 'Real-time video calling for customer support',
-};
+import './globals.css';
+import { useEffect } from 'react';
+import { useAuthStore } from '@/store/auth';
+
+function AuthInitializer({ children }: { children: React.ReactNode }) {
+  useEffect(() => {
+    useAuthStore.getState().initialize();
+  }, []);
+
+  return children;
+}
 
 export default function RootLayout({
   children,
@@ -12,7 +19,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <AuthInitializer>{children}</AuthInitializer>
+      </body>
     </html>
   );
 }
