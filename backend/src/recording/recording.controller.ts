@@ -1,15 +1,20 @@
 import { Controller, Post, Get, Param, Body, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RecordingService } from './recording.service';
+import { SessionService } from '../session/session.service';
 
 @Controller('recordings')
 export class RecordingController {
-  constructor(private recordingService: RecordingService) {}
+  constructor(
+    private recordingService: RecordingService,
+    private sessionService: SessionService,
+  ) {}
 
   @UseGuards(JwtAuthGuard)
   @Post('start')
-  startRecording(@Body('sessionId') sessionId: string) {
-    return this.recordingService.startRecording(sessionId);
+  async startRecording(@Body('sessionId') sessionId: string) {
+    const session = await this.sessionService.getSession(sessionId);
+    return this.recordingService.startRecording(sessionId, session?.roomName || '');
   }
 
   @UseGuards(JwtAuthGuard)

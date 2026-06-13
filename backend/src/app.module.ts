@@ -7,21 +7,44 @@ import { ChatModule } from './chat/chat.module';
 import { RecordingModule } from './recording/recording.module';
 import { AdminModule } from './admin/admin.module';
 import { MetricsModule } from './metrics/metrics.module';
+import { PresenceModule } from './presence/presence.module';
+import { StorageModule } from './storage/storage.module';
+
+const getDatabaseConfig = () => {
+  if (process.env.DATABASE_URL) {
+    console.log('Using DATABASE_URL for Neon connection');
+    return {
+      type: 'postgres' as const,
+      url: process.env.DATABASE_URL,
+      entities: [__dirname + '/**/*.entity{.ts,.js}'],
+      synchronize: true,
+      ssl: {
+        rejectUnauthorized: false,
+      },
+      extra: {
+        max: 20,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 5000,
+      },
+    };
+  }
+  return {
+    type: 'postgres' as const,
+    host: process.env.DATABASE_HOST || 'localhost',
+    port: parseInt(process.env.DATABASE_PORT) || 5432,
+    username: process.env.DATABASE_USER || 'postgres',
+    password: process.env.DATABASE_PASSWORD || 'postgres',
+    database: process.env.DATABASE_NAME || 'supportvision',
+    entities: [__dirname + '/**/*.entity{.ts,.js}'],
+    synchronize: true,
+  };
+};
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.DATABASE_HOST || 'localhost',
-      port: parseInt(process.env.DATABASE_PORT) || 5432,
-      username: process.env.DATABASE_USER || 'postgres',
-      password: process.env.DATABASE_PASSWORD || 'postgres',
-      database: process.env.DATABASE_NAME || 'supportvision',
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true,
-    }),
+    TypeOrmModule.forRoot(getDatabaseConfig()),
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'secret',
+      secret: process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-in-production',
       signOptions: { expiresIn: '7d' },
     }),
     AuthModule,
@@ -30,6 +53,8 @@ import { MetricsModule } from './metrics/metrics.module';
     RecordingModule,
     AdminModule,
     MetricsModule,
+    PresenceModule,
+    StorageModule,
   ],
 })
 export class AppModule {}

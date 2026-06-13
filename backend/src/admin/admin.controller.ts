@@ -13,14 +13,14 @@ export class AdminController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('sessions/:id')
-  getSessionDetails(@Param('id') id: string) {
-    return this.adminService.getSessionDetails(id);
-  }
-
-  @UseGuards(JwtAuthGuard)
   @Post('sessions/:id/end')
   forceEndSession(@Param('id') id: string) {
     return this.adminService.forceEndSession(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('sessions/:id/events')
+  getSessionEvents(@Param('id') id: string) {
+    return this.adminService.getSessionEvents(id);
   }
 }

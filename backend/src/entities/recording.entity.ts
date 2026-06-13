@@ -13,14 +13,20 @@ export class Recording {
   @JoinColumn({ name: 'sessionId' })
   session: Session;
 
-  @Column({ type: 'enum', enum: ['in_progress', 'processing', 'ready', 'failed'], default: 'in_progress' })
-  status: 'in_progress' | 'processing' | 'ready' | 'failed';
+  @Column({ type: 'enum', enum: ['recording', 'processing', 'ready', 'failed'], default: 'recording' })
+  status: 'recording' | 'processing' | 'ready' | 'failed';
+
+  @Column({ nullable: true })
+  egressId: string;
 
   @Column({ nullable: true })
   fileUrl: string;
 
   @Column({ nullable: true })
   duration: number;
+
+  @Column({ nullable: true, type: 'timestamp' })
+  endedAt: Date;
 
   @CreateDateColumn()
   createdAt: Date;

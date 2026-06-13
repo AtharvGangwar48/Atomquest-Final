@@ -35,7 +35,7 @@ export class SessionService {
 
     await this.logEvent(session.id, 'session_created', { agentId });
 
-    return { sessionId: session.id, joinUrl: `/session/join?token=${joinToken}` };
+    return { sessionId: session.id, joinToken, joinUrl: `/session/join?token=${joinToken}` };
   }
 
   async joinSession(token: string, userId: string, userName: string) {
@@ -101,6 +101,33 @@ export class SessionService {
       where: { id: sessionId },
       relations: ['agent', 'customer'],
     });
+  }
+
+  async agentJoin(sessionId: string, userId: string, userName: string) {
+    const session = await this.sessionRepo.findOne({ where: { id: sessionId } });
+    if (!session) throw new NotFoundException('Session not found');
+    if (session.agentId !== userId) throw new ForbiddenException('Not the session agent');
+    if (session.status === 'ended') throw new ForbiddenException('Session has ended');
+
+    if (session.status === 'created') {
+      session.status = 'active';
+      await this.sessionRepo.save(session);
+    }
+
+    const livekitToken = this.livekitService.generateToken(
+      session.roomName,
+      userId,
+      JSON.stringify({ userId, userName }),
+    );
+
+    await this.logEvent(sessionId, 'agent_joined', { userId, userName });
+
+    return {
+      roomToken: livekitToken,
+      roomName: session.roomName,
+      wsUrl: this.livekitService.getWsUrl(),
+      sessionId: session.id,
+    };
   }
 
   private async logEvent(sessionId: string, eventType: string, metadata: any) {

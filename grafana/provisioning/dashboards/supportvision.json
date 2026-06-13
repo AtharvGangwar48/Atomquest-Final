@@ -1,0 +1,59 @@
+{
+  "title": "SupportVision",
+  "uid": "supportvision",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "10s",
+  "time": { "from": "now-1h", "to": "now" },
+  "panels": [
+    {
+      "id": 1, "type": "stat", "title": "Active Calls",
+      "gridPos": { "x": 0, "y": 0, "w": 6, "h": 4 },
+      "targets": [{ "expr": "supportvision_active_sessions", "refId": "A" }],
+      "options": { "colorMode": "background" },
+      "fieldConfig": { "defaults": { "color": { "fixedColor": "green", "mode": "fixed" }, "thresholds": { "steps": [{ "color": "green", "value": 0 }] } } }
+    },
+    {
+      "id": 2, "type": "stat", "title": "Connected Users",
+      "gridPos": { "x": 6, "y": 0, "w": 6, "h": 4 },
+      "targets": [{ "expr": "supportvision_connected_users", "refId": "A" }],
+      "options": { "colorMode": "background" },
+      "fieldConfig": { "defaults": { "color": { "fixedColor": "blue", "mode": "fixed" }, "thresholds": { "steps": [{ "color": "blue", "value": 0 }] } } }
+    },
+    {
+      "id": 3, "type": "stat", "title": "Total Sessions",
+      "gridPos": { "x": 12, "y": 0, "w": 6, "h": 4 },
+      "targets": [{ "expr": "supportvision_total_sessions_total", "refId": "A" }],
+      "options": { "colorMode": "background" },
+      "fieldConfig": { "defaults": { "color": { "fixedColor": "purple", "mode": "fixed" }, "thresholds": { "steps": [{ "color": "purple", "value": 0 }] } } }
+    },
+    {
+      "id": 4, "type": "stat", "title": "Recordings Started",
+      "gridPos": { "x": 18, "y": 0, "w": 6, "h": 4 },
+      "targets": [{ "expr": "supportvision_recordings_started_total", "refId": "A" }],
+      "options": { "colorMode": "background" },
+      "fieldConfig": { "defaults": { "color": { "fixedColor": "red", "mode": "fixed" }, "thresholds": { "steps": [{ "color": "red", "value": 0 }] } } }
+    },
+    {
+      "id": 5, "type": "timeseries", "title": "Active Sessions Over Time",
+      "gridPos": { "x": 0, "y": 4, "w": 12, "h": 8 },
+      "targets": [{ "expr": "supportvision_active_sessions", "legendFormat": "Active Sessions", "refId": "A" }]
+    },
+    {
+      "id": 6, "type": "timeseries", "title": "Avg Call Duration (seconds)",
+      "gridPos": { "x": 12, "y": 4, "w": 12, "h": 8 },
+      "targets": [{ "expr": "supportvision_avg_call_duration_seconds", "legendFormat": "Avg Duration", "refId": "A" }]
+    },
+    {
+      "id": 7, "type": "timeseries", "title": "Error Rate",
+      "gridPos": { "x": 0, "y": 12, "w": 12, "h": 8 },
+      "targets": [{ "expr": "rate(supportvision_errors_total[1m])", "legendFormat": "Errors/s", "refId": "A" }],
+      "fieldConfig": { "defaults": { "color": { "fixedColor": "red", "mode": "fixed" } } }
+    },
+    {
+      "id": 8, "type": "timeseries", "title": "Recordings Started Over Time",
+      "gridPos": { "x": 12, "y": 12, "w": 12, "h": 8 },
+      "targets": [{ "expr": "rate(supportvision_recordings_started_total[5m])", "legendFormat": "Recordings/s", "refId": "A" }]
+    }
+  ]
+}

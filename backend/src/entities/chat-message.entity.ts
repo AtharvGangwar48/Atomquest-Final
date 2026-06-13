@@ -30,6 +30,9 @@ export class ChatMessage {
   @Column({ nullable: true })
   fileUrl: string;
 
+  @Column({ nullable: true })
+  mimeType: string;
+
   @CreateDateColumn()
   createdAt: Date;
 }

@@ -14,30 +14,35 @@ export default function SessionPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) {
-      router.push('/');
-      return;
-    }
+    if (!user) { router.push('/'); return; }
     loadSession();
   }, [user, params.id]);
 
   const loadSession = async () => {
     try {
       const sessionId = params.id as string;
-      const { data } = await api.get(`/sessions/${sessionId}`);
-      
-      if (data.status === 'ended') {
-        alert('This session has ended');
-        router.push('/dashboard');
-        return;
+
+      let data: any;
+      if (user!.role === 'agent') {
+        // Agent joins their own session directly
+        const res = await api.post(`/sessions/${sessionId}/agent-join`);
+        data = res.data;
+      } else {
+        // Customer needs a join token — get it from session info
+        const sessionRes = await api.get(`/sessions/${sessionId}`);
+        if (sessionRes.data.status === 'ended') {
+          alert('This session has ended');
+          router.push('/sessions');
+          return;
+        }
+        const res = await api.post('/sessions/join', { token: sessionRes.data.joinToken });
+        data = res.data;
       }
 
-      const token = data.joinToken || '';
-      const { data: joinData } = await api.post('/sessions/join', { token });
-      setRoomData(joinData);
-    } catch (err) {
-      alert('Failed to load session');
-      router.push('/');
+      setRoomData(data);
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Failed to load session');
+      router.push(user?.role === 'agent' ? '/dashboard' : '/sessions');
     } finally {
       setLoading(false);
     }
@@ -46,17 +51,15 @@ export default function SessionPage() {
   const handleEndCall = async () => {
     try {
       await api.post(`/sessions/${params.id}/end`);
-      router.push('/dashboard');
-    } catch (err) {
-      console.error(err);
-    }
+    } catch {}
+    router.push(user?.role === 'agent' ? '/dashboard' : '/sessions');
   };
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-900">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4" />
           <p className="text-white">Loading session...</p>
         </div>
       </div>
