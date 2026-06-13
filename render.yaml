@@ -4,23 +4,24 @@ services:
     env: node
     region: oregon
     plan: free
-    buildCommand: cd backend && npm install && npm run build
-    startCommand: cd backend && npm run start:prod
+    buildCommand: npm install && npm run build
+    startCommand: npm run start:prod
+    rootDir: backend
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 3001
       - key: DATABASE_URL
-        sync: false
+        value: postgresql://neondb_owner:npg_hWAn8RQK7VPf@ep-delicate-moon-aonib0iy-pooler.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
       - key: JWT_SECRET
         generateValue: true
       - key: LIVEKIT_API_KEY
-        sync: false
+        value: devkey
       - key: LIVEKIT_API_SECRET
-        sync: false
+        value: secret
       - key: LIVEKIT_WS_URL
-        sync: false
+        value: ws://localhost:7880
       - key: REDIS_HOST
         fromService:
           type: redis
@@ -32,7 +33,7 @@ services:
           name: atomberg-redis
           property: port
       - key: MINIO_ENDPOINT
-        value: minio
+        value: localhost
       - key: MINIO_PORT
         value: 9000
       - key: MINIO_ACCESS_KEY
@@ -41,6 +42,10 @@ services:
         value: minioadmin
       - key: MINIO_BUCKET
         value: atomberg
+      - key: UPLOAD_DIR
+        value: ./uploads
+      - key: FRONTEND_URL
+        sync: false
     healthCheckPath: /
 
   - type: redis
