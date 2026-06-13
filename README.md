@@ -1,439 +1,219 @@
-# 🎥 Atomberg - Personal Video Chat Service
+# Atomberg — Self-Hosted Video Chat Platform
 
-```
-═══════════════════════════════════════════════════════════════
-  Secure • Private • Self-Hosted • Real-Time Video Calling
-═══════════════════════════════════════════════════════════════
-```
+Atomberg is a self-hosted, secure video calling platform built for customer support teams. Agents create sessions and share join links with customers, while administrators oversee the entire platform from a single dashboard.
 
 ---
 
-## 💡 What is Atomberg?
+## Tech Stack
 
-Atomberg is a **personal video chat service** that lets you have video calls with complete privacy and control. Everything runs on your own servers—no third-party services, no data shared with external companies.
-
-### Simple Explanation
-
-Think of Atomberg like a **private phone call system** but with video. 
-
-- **Person A** (Agent) creates a chat session and sends a link
-- **Person B** (Customer) clicks the link and joins
-- They can video call, text chat, and even record the conversation
-- **Everything stays private** on your server
-
----
-
-## ✨ What Can You Do?
-
-### 👤 Customers
-- Join video calls via a link
-- See and hear the agent clearly
-- Send text messages during the call
-- Leave whenever you want
-
-### 💼 Agents (Support Staff)
-- Create video call sessions
-- Share links with customers
-- Record conversations for quality assurance
-- See performance stats
-- Send text messages to customers
-
-### 👨‍💼 Admins
-- See all conversations happening
-- Manage users and their roles
-- View system health and metrics
-- Monitor call quality
-- Access all recordings
+| Technology | Role |
+|---|---|
+| Next.js + React | Frontend UI |
+| NestJS | Backend API |
+| PostgreSQL | Database |
+| LiveKit | Video engine (SFU) |
+| Socket.IO | Real-time chat |
+| Redis | Caching and pub/sub |
+| JWT + Bcrypt | Authentication and security |
 
 ---
 
-## 🚀 How It Works (3 Steps)
+## User Roles
 
-### 1️⃣ Agent Creates Session
-```
-Agent clicks "New Chat" → Link is generated → Link is sent to customer
-```
+**Customer**
+Joins video calls using a link shared by an agent. Can submit meeting requests and view past session history.
 
-### 2️⃣ Customer Joins
-```
-Customer opens link in browser → Automatically connected → Video starts
-```
+**Agent**
+Creates sessions, shares join links with customers, schedules sessions, sends in-app notifications, and can record calls.
 
-### 3️⃣ Real-time Communication
-```
-Video ✅  Audio ✅  Chat ✅  Recording ✅
-```
-
-**No installation needed. Just open in browser.**
+**Admin**
+Has full system oversight — manages user accounts, approves or rejects meeting requests, monitors live sessions, and sends platform-wide notifications.
 
 ---
 
-## 🔧 Tech Stack (What Powers It)
+## Application Walkthrough
 
-| Layer | Technology |
-|-------|-----------|
-| **Website** | Next.js + React |
-| **Server** | NestJS |
-| **Database** | PostgreSQL |
-| **Video** | LiveKit (Self-hosted) |
-| **Real-time Messages** | Socket.IO |
-| **Cache** | Redis |
+### 1. Registration and Login
 
-**In Simple Terms:** Everything is built with modern, reliable technologies. LiveKit handles the video calling, and we store data securely on PostgreSQL.
+Navigate to `/login` to register or log in.
 
----
+- Customers register with their name, email, and password.
+- Agents register the same way, plus an Employee ID. An admin must verify and activate the account before the agent can log in.
+- The admin account is pre-seeded — no registration required.
 
-## 🎯 Key Features
-
-### Core Features
-- ✅ HD Video Calling
-- ✅ Clear Audio
-- ✅ Text Chat During Calls
-- ✅ Session History
-- ✅ Secure Links (Tokens expire after 24 hours)
-
-### Premium Features
-- ✅ Call Recording
-- ✅ Admin Dashboard
-- ✅ System Monitoring
-- ✅ User Management
-- ✅ Performance Metrics
+After login, users are automatically redirected to their respective dashboards.
 
 ---
 
-## 🔒 Security & Privacy
+### 2. Agent Dashboard (`/dashboard`)
 
-```
-✅ NO Third-Party APIs
-   Your data never leaves your server
+**Session Management**
+Clicking "New Session" creates a session and automatically copies the join link to the clipboard. The agent shares this link with the customer. Once the customer joins, the session turns Active and the agent can click "Join Call" to enter the video room.
 
-✅ Self-Hosted
-   Complete control and ownership
+**Scheduling**
+Agents can schedule future sessions by selecting a date, time, and optionally assigning a specific customer. Scheduled sessions appear under a dedicated tab.
 
-✅ Encrypted Connections
-   All data is encrypted
+**Notifications**
+Agents can send in-app notifications (categorized as Info, Success, Warning, or Meeting) to selected customers or all customers at once.
 
-✅ Role-Based Access
-   Each user only sees what they should
-
-✅ Token Expiration
-   Links expire automatically (24 hours)
-```
+**Session History**
+All past and active sessions are listed with status indicators: Waiting, Active, and Ended.
 
 ---
 
-## ⚠️ NOT Peer-to-Peer (This is Good!)
+### 3. Customer Portal (`/sessions`)
 
-### What's the Difference?
+**Joining a Meeting**
+Customers paste the full join link or token provided by the agent and click "Join Now."
 
-**Peer-to-Peer (❌ Old Way):**
-- Direct connection between users
-- Fails behind firewalls
-- Unreliable in corporate networks
+**Scheduling a Meeting**
+Customers can submit a meeting request with a topic, description, and preferred time. The request is sent to the admin for approval.
 
-**Atomberg (✅ Better Way):**
-- Server routes all video
-- Works everywhere (behind any firewall)
-- Reliable and stable
-- Can record conversations
-- Multiple people can join later
+**Request Tracking**
+Customers can track the status of their submitted requests: Pending, Approved, or Rejected.
+
+**Session History**
+All past sessions are listed. Active sessions display a "Join Call" button to re-enter the room.
 
 ---
 
-## 📹 LiveKit - The Video Engine
+### 4. Video Room (`/session/[id]`)
 
-LiveKit is the technology that handles all video calling. Think of it as a sophisticated switchboard operator for video calls:
+The live call interface, accessible to both agents and customers.
 
-- **Receives** video from Customer
-- **Receives** video from Agent
-- **Optimizes** quality based on connection speed
-- **Sends** best video to each person
-- **Records** the conversation
+| Control | Function |
+|---|---|
+| Microphone button | Toggle microphone on or off |
+| Camera button | Toggle camera on or off |
+| Chat button | Open or close the side chat panel |
+| Record button | Start or stop screen recording (saved locally as `.webm`) |
+| End Call button | Leave the session and return to the dashboard |
+| Share Room button | Copy the room link to clipboard |
 
-**Why LiveKit?** It's:
-- ✅ Self-hosted (runs on your server)
-- ✅ Production-grade (used by companies worldwide)
-- ✅ Open-source (no vendor lock-in)
-- ✅ Easy to set up (Docker image)
+The chat panel supports text messages and file sharing — images, video, audio, PDFs, and documents. Files are uploaded to storage and shared with all participants in real time.
 
 ---
 
-## 🚀 Quick Start
+### 5. Admin Dashboard (`/admin`)
 
-### Requirements
-- Docker installed
-- ~5 minutes
+The admin dashboard is organized into five tabs:
 
-### Setup
+| Tab | Contents |
+|---|---|
+| Stats | Summary counts: total customers, total agents, live meetings, pending requests |
+| Customers | All registered customers — name, email, join date. Admins can delete accounts. |
+| Agents | All agents — verify pending agents to activate their accounts, delete agents. Verified agents are marked accordingly. |
+| Notifications | Send a notification to all users, agents only, or customers only. Requires a title and message body. |
+| Meetings | Three sections: Meeting Requests (approve or reject with optional note), Live Sessions (force-end any active call), All Sessions (complete history with statuses) |
 
-**1. Start Everything**
+---
+
+## Quick Start
+
+**Requirements:** Docker, Node.js 18+
+
 ```bash
+# 1. Start the database, Redis, and LiveKit
 docker-compose up -d
-```
 
-**2. Run Backend**
-```bash
+# 2. Start the backend
 cd backend
 npm install
 npm run start:dev
-```
 
-**3. Run Frontend**
-```bash
+# 3. Start the frontend
 cd frontend
 npm install
 npm run dev
 ```
 
-**4. Open in Browser**
+Open [http://localhost:3000](http://localhost:3000)
+
+### Demo Credentials
+
+| Role | Email | Password |
+|---|---|---|
+| Admin | admin@atomberg.com | admin123 |
+| Agent | agent@atomberg.com | agent123 |
+| Customer | customer@atomberg.com | customer123 |
+
+---
+
+## How Video Works — Server-Routed via LiveKit (Not Peer-to-Peer)
+
+Atomberg does not use peer-to-peer video. All video and audio traffic is routed through a LiveKit server that runs entirely within your own infrastructure via Docker.
+
+### Why Not Peer-to-Peer?
+
+In a standard P2P WebRTC setup, browsers connect directly to each other. This approach has significant limitations:
+
+- Connections frequently fail behind firewalls or NAT
+- It does not scale beyond two participants — each additional participant multiplies the number of direct connections
+- There is no server-side control, so calls cannot be monitored, force-ended, or recorded centrally
+
+### How LiveKit Works
+
+LiveKit is an SFU — a Selective Forwarding Unit. It acts as a media server in the middle of every call:
+
 ```
-http://localhost:3000
+  Agent Browser  -->  LiveKit Server  <--  Customer Browser
+                           |
+              All media routes through the server
 ```
 
-### Demo Accounts
+1. The agent creates a session. The NestJS backend calls the LiveKit API and generates a signed room token.
+2. Both participants join using their tokens. Their browsers connect to the LiveKit server, not to each other.
+3. LiveKit forwards each participant's video and audio streams to all others in the room.
+4. When the call ends, the backend signals LiveKit to close the room.
+
+### Comparison
+
+| Feature | P2P WebRTC | Atomberg with LiveKit |
+|---|---|---|
+| Works behind firewalls | Often fails | Always works |
+| Admin can force-end a call | No | Yes |
+| Scales beyond two participants | Poor | Yes |
+| Media stays within your infrastructure | No (direct between browsers) | Yes (LiveKit on your own server) |
+| Recording support | Complex | Built-in |
+
+Since LiveKit runs on your own Docker container, no video or audio ever reaches any third-party service.
+
+---
+
+## Security
+
+- Passwords are hashed using Bcrypt
+- All API routes are protected with JWT tokens
+- Session join tokens expire after 24 hours
+- Role-based access control ensures users only see their own data
+- No third-party video services — LiveKit runs entirely on your own server
+
+---
+
+## Project Structure
 
 ```
-ADMIN:
-  Email: admin@atomberg.com
-  Password: admin123
-
-AGENT:
-  Email: agent@atomberg.com
-  Password: agent123
-
-CUSTOMER:
-  Email: customer@atomberg.com
-  Password: customer123
+Atomquest-Final/
+├── frontend/              Next.js application
+│   ├── app/
+│   │   ├── home/          Landing page
+│   │   ├── login/         Authentication
+│   │   ├── dashboard/     Agent dashboard
+│   │   ├── sessions/      Customer portal
+│   │   ├── admin/         Admin dashboard
+│   │   └── session/       Live video room
+│   └── components/
+│       └── VideoRoom.tsx
+├── backend/               NestJS API
+│   └── src/
+│       ├── auth/          Login and registration
+│       ├── session/       Video session management
+│       ├── chat/          Real-time messaging
+│       ├── admin/         Admin controls
+│       └── ...
+└── docker-compose.yml
 ```
 
 ---
 
-## 📊 The Three User Types
-
-### 🟢 Customer
-**What they do:** Join video calls
-
-**Can:**
-- Join a session via link
-- Turn camera/mic on/off
-- Send messages
-- See call history
-
-**Cannot:**
-- Create new sessions
-- See other people's calls
-- Access admin panel
-
----
-
-### 🟡 Agent
-**What they do:** Support customers through video
-
-**Can:**
-- Create new sessions
-- Share links with customers
-- Start recording
-- See their performance stats
-- Send messages
-- View their own call history
-
-**Cannot:**
-- See other agents' calls
-- Manage users
-- Access system metrics
-
----
-
-### 🔴 Admin
-**What they do:** Manage the entire system
-
-**Can:**
-- See ALL calls happening
-- Manage users (add, remove, change roles)
-- View system health
-- Access all recordings
-- See performance metrics
-- Monitor who's online
-
-**Cannot:**
-- Modify core system settings (direct database access)
-
----
-
-## 📱 Dashboards Overview
-
-### Customer Dashboard
-```
-┌─────────────────────────┐
-│ Welcome, John!          │
-├─────────────────────────┤
-│ 🔗 Join Session         │
-│ 📋 My Call History      │
-│ ⏱️  Total Support Time   │
-└─────────────────────────┘
-```
-
-### Agent Dashboard
-```
-┌─────────────────────────┐
-│ Agent Panel             │
-├─────────────────────────┤
-│ ➕ Create New Chat      │
-│ 📹 Active Sessions      │
-│ 📊 My Stats             │
-│ 🎥 Recordings           │
-└─────────────────────────┘
-```
-
-### Admin Dashboard
-```
-┌─────────────────────────┐
-│ System Administration   │
-├─────────────────────────┤
-│ 👥 User Management      │
-│ 🎥 All Sessions         │
-│ 📊 System Health        │
-│ 📈 Metrics              │
-└─────────────────────────┘
-```
-
----
-
-## 🔐 How Your Data Stays Safe
-
-1. **Password Protection** - Passwords are hashed (cannot be read)
-2. **Token-Based Login** - Secure login without sending passwords
-3. **Encrypted Connections** - All data travels through secure channels
-4. **Role-Based Access** - Users only access their own data
-5. **No Third Parties** - Data never leaves your server
-
----
-
-## 📋 Features Checklist
-
-| Feature | Status | Who Uses It |
-|---------|--------|-----------|
-| Video Calling | ✅ | Everyone |
-| Audio Calling | ✅ | Everyone |
-| Text Chat | ✅ | Everyone |
-| Recording | ✅ | Agents + Admins |
-| Call History | ✅ | Everyone |
-| User Management | ✅ | Admins |
-| System Metrics | ✅ | Admins |
-| Mute Controls | ✅ | Everyone |
-| Session Links | ✅ | Agents |
-| Role-Based Access | ✅ | All Roles |
-
----
-
-## 🎯 System Status
-
-```
-✅ Backend: NestJS (Node.js)
-✅ Frontend: Next.js + React
-✅ Database: PostgreSQL
-✅ Video: LiveKit (Self-hosted)
-✅ Real-time: Socket.IO + Redis
-✅ Security: JWT + Bcrypt
-✅ Status: Production Ready
-```
-
----
-
-## 💬 How to Use - Simple Example
-
-### Scenario: Customer Needs Help
-
-**Step 1: Agent Perspective**
-1. Agent logs in
-2. Clicks "Create New Chat"
-3. Gets a link: `atomberg.com/join/abc123`
-4. Sends link to customer
-
-**Step 2: Customer Perspective**
-1. Customer clicks the link
-2. Browser opens automatically
-3. See agent's camera and hear audio
-4. Can send text messages
-5. Agent can record the call
-
-**Step 3: After the Call**
-1. Recording is saved
-2. Both see it in their history
-3. Customer can rate the support
-4. Agent can review the recording
-
----
-
-## ❓ FAQ
-
-**Q: Is my data safe?**  
-A: Yes! Everything stays on your own server. No data goes to external companies.
-
-**Q: Do customers need to install anything?**  
-A: No! Just click the link and use their browser.
-
-**Q: Can I use this for business?**  
-A: Yes! It's perfect for customer support teams.
-
-**Q: What if I have 100 customers?**  
-A: Atomberg can handle multiple calls simultaneously.
-
-**Q: Can I record calls?**  
-A: Yes! Agents and admins can record for quality assurance.
-
-**Q: What happens if someone's internet is slow?**  
-A: The video quality automatically adjusts to work smoothly.
-
----
-
-## 📞 Support
-
-- **Setup Issues?** Check the full `ARCHITECTURE.md` guide
-- **Demo Problems?** See `DEMO_SCRIPT.md` for step-by-step walkthrough
-- **API Documentation?** Check backend controllers in `src/` folder
-
----
-
-## 🎓 Understanding the Architecture (Simple Version)
-
-**Without getting technical:**
-
-```
-Customer → Clicks Link → Frontend Website → Backend Server → LiveKit Video Service
-                ↑                                              ↓
-                └──────────── Sends Live Video ──────────────┘
-```
-
-That's it! The backend connects customers to the video service, and LiveKit handles the video calling.
-
----
-
-## 📦 File Structure
-
-```
-Atomberg/
-├── frontend/          - Website (what users see)
-├── backend/           - Server (handles requests)
-├── docker-compose.yml - Database & video setup
-└── README.md          - This file
-```
-
----
-
-## ✨ Summary
-
-Atomberg is a **simple, secure video chat service** for businesses.
-
-- 🎯 **Easy to use** - Just click a link
-- 🔒 **Completely private** - Everything on your server
-- 💼 **Professional** - Perfect for customer support
-- ✅ **Works everywhere** - Behind firewalls, corporate networks, etc.
-
-**Ready to get started?** Follow the Quick Start section above!
-
----
-
-**Atomberg v1.0.0 • Production Ready ✅**
-
-*A personal video chat service with complete control and privacy.*
+**Atomberg v1.0** · Built for AtomQuest Hackathon
