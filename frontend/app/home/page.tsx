@@ -43,7 +43,7 @@ export default function HomePage() {
           <div className="max-w-4xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 bg-white/15 border border-white/20 rounded-full px-4 py-1.5 text-sm font-medium mb-8">
               <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-              Built for AtomQuest Hackathon 2026
+              Built for AtomQuest Hackathon 2024
             </div>
             <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
               Personalized<br />
@@ -351,7 +351,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className="border-t border-gray-800 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm">
-            <p>© 2026 Atomberg. All rights reserved.</p>
+            <p>© 2024 Atomberg. All rights reserved.</p>
             <p className="text-gray-600">Personalized Video Chat Service · Self-hosted · Open Infrastructure</p>
           </div>
         </div>

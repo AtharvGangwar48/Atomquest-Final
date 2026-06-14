@@ -14,11 +14,23 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   
   app.enableCors({
-    origin: [
-      'http://localhost:3000',
-      process.env.FRONTEND_URL,
-      /\.vercel\.app$/,
-    ].filter(Boolean),
+    origin: (origin, callback) => {
+      // Allow requests with no origin (mobile apps, curl, Postman)
+      if (!origin) return callback(null, true);
+      const allowed = [
+        'http://localhost:3000',
+        process.env.FRONTEND_URL,
+      ].filter(Boolean);
+      // Allow any vercel.app subdomain
+      if (
+        allowed.includes(origin) ||
+        /\.vercel\.app$/.test(origin) ||
+        /\.render\.com$/.test(origin)
+      ) {
+        return callback(null, true);
+      }
+      return callback(null, true); // Open CORS for hackathon demo — restrict in production
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],

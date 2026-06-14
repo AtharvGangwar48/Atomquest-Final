@@ -58,8 +58,13 @@ function LoginContent() {
         }
       }
     } catch (err: any) {
-      const msg = err.response?.data?.message || 'Authentication failed';
-      setError(msg);
+      if (!err.response) {
+        // Network error — backend cold start or unreachable
+        setError('Cannot reach server. If this is the first request, the backend may be waking up (Render free tier takes ~30s). Please try again.');
+      } else {
+        const msg = err.response?.data?.message;
+        setError(Array.isArray(msg) ? msg.join(', ') : msg || 'Authentication failed');
+      }
     } finally {
       setLoading(false);
     }
