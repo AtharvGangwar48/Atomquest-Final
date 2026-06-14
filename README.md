@@ -1,32 +1,153 @@
 <div align="center">
 
-<img src="https://img.shields.io/badge/Atomberg-Personal%20Video%20Chat-3B82F6?style=for-the-badge&logo=video&logoColor=white" alt="Atomberg" />
+# Atomberg
+### Personalized Video Chat Service
 
-<h1>📹 Atomberg</h1>
-<h3>Personal Video Chat Application</h3>
+A self-hosted video calling platform for customer support — agents create sessions, customers join via link, admins manage everything.
 
-<p>A self-hosted, secure video calling platform for customer support teams.<br/>Agents create sessions, customers join via link, admins manage everything.</p>
-
-<br/>
-
-[![Next.js](https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white)](https://nextjs.org)
+[![Next.js](https://img.shields.io/badge/Next.js-000?style=flat-square&logo=nextdotjs&logoColor=white)](https://nextjs.org)
 [![NestJS](https://img.shields.io/badge/NestJS-E0234E?style=flat-square&logo=nestjs&logoColor=white)](https://nestjs.com)
+[![LiveKit](https://img.shields.io/badge/LiveKit-FF4719?style=flat-square&logoColor=white)](https://livekit.io)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white)](https://postgresql.org)
-[![Redis](https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=redis&logoColor=white)](https://redis.io)
-[![Socket.io](https://img.shields.io/badge/Socket.IO-010101?style=flat-square&logo=socketdotio&logoColor=white)](https://socket.io)
-[![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white)](https://docker.com)
-[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://typescriptlang.org)
+
+**[Live Demo](https://atomquest-final.vercel.app)**
 
 </div>
 
 ---
 
-## ⚡ Quick Start
+## What is Atomberg?
 
-> **Requirements:** Docker, Node.js 18+
+Atomberg is a **self-hosted video customer support platform**. Instead of peer-to-peer video (which fails behind firewalls), all media is routed through a **LiveKit SFU server** running on your own infrastructure — no third-party video service involved.
+
+---
+
+## Screenshots
+
+### 🔐 Login Page
+
+![Login](images/Login.png)
+
+Clean split-screen login with clickable demo credentials. Backend runs on Render free tier — first load may take ~50 seconds to wake up.
+
+---
+
+### 🔵 Agent Dashboard
+
+![Agent Dashboard Overview](images/agent%20dashboard%201.png)
+
+Agent's main overview — active sessions, waiting sessions, quick actions (New Session, Schedule, Notify).
+
+![Agent Dashboard Sessions](images/agent%20dashboard%202.png)
+
+Session History tab — full table of all sessions with status badges and actions.
+
+![Agent Dashboard Scheduled](images/agent%20dashboard%203.png)
+
+Scheduled Sessions tab — upcoming meetings with customer assignment and cancel option.
+
+---
+
+### 🟢 Customer Dashboard
+
+![Customer Dashboard](images/CUSTOMER%20DASHBOARD%201.png)
+
+Hero section with stats — total sessions, active now, completed. Join a meeting by pasting the agent's link.
+
+![Customer Dashboard Sessions](images/CUSTOMER%20DASHBOARD%202.png)
+
+Session history cards — each session shows agent name, status badge, and Join Call button for active sessions.
+
+![Customer Schedule Meeting](images/CUSTOMER%20DASHBOARD%203.png)
+
+Schedule a Meeting modal — customer submits topic, description, and preferred time. Request goes to admin for approval.
+
+---
+
+### 🔴 Admin Dashboard
+
+![Admin Dashboard Stats](images/admin%20dasboard%201.png)
+
+Admin overview — live counts of total customers, agents, active meetings, and pending meeting requests.
+
+![Admin Agents Management](images/admin%20dasboard%202.png)
+
+Agents tab — verify pending agents (gives them the ✓ badge), delete unnecessary accounts.
+
+![Admin Meeting Requests](images/admin%20dasboard%203.png)
+
+Meeting Requests tab — approve or reject customer-submitted meeting requests with an optional note.
+
+![Admin Notifications](images/admin%20dasboard%204.png)
+
+Admin Notifications — send messages to All Users, Agents Only, or Customers Only with type selection (Info, Warning, Success, Meeting).
+
+---
+
+### 🔔 Notification System
+
+![Notification Bell](images/Notification%20bell%20icon%20for%20all.png)
+
+Bell icon in the navbar for every user — red badge shows unread count. Click to see notifications with sender name and relative time. Click a notification to mark it read.
+
+![Agent Notification Send](images/Agent%20Notification%20system.png)
+
+Agent sending notifications — select individual customers or "Select All" for bulk, choose notification type, add title and message.
+
+![Admin Notification Send](images/Admin%20Notification%20system.png)
+
+Admin sending notifications — broadcast to all users, agents only, or customers only from the admin panel.
+
+---
+
+## How It Works
+
+```
+1. Agent clicks "New Session"
+        ↓
+   Join link copied to clipboard
+        ↓
+2. Agent shares link with customer
+        ↓
+3. Customer opens link → logs in → joins room
+        ↓
+4. Both connect to LiveKit SFU server (NOT each other)
+        ↓
+5. LiveKit forwards video/audio between participants
+        ↓
+6. Agent ends call → session marked Ended
+```
+
+All video and audio stays on your server. Never browser-to-browser.
+
+---
+
+## User Roles
+
+| Role | Access | Key Actions |
+|------|--------|-------------|
+| 🟢 **Customer** | `/sessions` | Join via link, schedule meeting requests, view history |
+| 🔵 **Agent** | `/dashboard` | Create sessions, schedule future calls, send notifications |
+| 🔴 **Admin** | `/admin` | Verify agents, manage users, approve meetings, send broadcasts |
+
+---
+
+## Demo Credentials
+
+| Role | Email | Password |
+|------|-------|----------|
+| 🔴 Admin | `admin-vcp@atomquest.com` | `admin123` |
+| 🔵 Agent | `agent@demo.com` | `password123` |
+| 🟢 Customer | `customer@demo.com` | `password123` |
+
+> On the login page, click any credential card to auto-fill the form.
+
+---
+
+## Quick Start (Local)
 
 ```bash
-# 1. Start infrastructure (DB, Redis, LiveKit, MinIO)
+# 1. Start infrastructure
 docker-compose up -d
 
 # 2. Backend
@@ -36,224 +157,35 @@ cd backend && npm install && npm run start:dev
 cd frontend && npm install && npm run dev
 ```
 
-🌐 Open **[http://localhost:3000](http://localhost:3000)**
+Open **http://localhost:3000**
 
-### 🔑 Demo Credentials
+### Environment Variables
 
-| Role | Email | Password |
-|:---:|:---:|:---:|
-| 🔴 Admin | `admin@atomberg.com` | `admin123` |
-| 🔵 Agent | `agent@atomberg.com` | `agent123` |
-| 🟢 Customer | `customer@atomberg.com` | `customer123` |
-
----
-
-## 🛠️ Tech Stack
-
-| Technology | Badge | Role |
-|:---|:---|:---|
-| **Next.js + React** | ![Next.js](https://img.shields.io/badge/Next.js-000?style=flat-square&logo=nextdotjs&logoColor=white) | Frontend UI & routing |
-| **NestJS** | ![NestJS](https://img.shields.io/badge/NestJS-E0234E?style=flat-square&logo=nestjs&logoColor=white) | Backend REST API |
-| **PostgreSQL** | ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white) | Persistent database |
-| **LiveKit SFU** | ![LiveKit](https://img.shields.io/badge/LiveKit-FF4719?style=flat-square&logoColor=white) | Video & audio engine |
-| **Socket.IO** | ![Socket.io](https://img.shields.io/badge/Socket.IO-010101?style=flat-square&logo=socketdotio&logoColor=white) | Real-time chat & presence |
-| **Redis** | ![Redis](https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=redis&logoColor=white) | Caching & pub/sub |
-| **MinIO** | ![MinIO](https://img.shields.io/badge/MinIO-C72E49?style=flat-square&logo=minio&logoColor=white) | File & recording storage |
-| **JWT + Bcrypt** | ![JWT](https://img.shields.io/badge/JWT-000000?style=flat-square&logo=jsonwebtokens&logoColor=white) | Auth & security |
-| **Prometheus + Grafana** | ![Grafana](https://img.shields.io/badge/Grafana-F46800?style=flat-square&logo=grafana&logoColor=white) | Metrics & monitoring |
-
----
-
-## 👥 User Roles
-
-<table>
-<tr>
-<td width="33%">
-
-### 🟢 Customer
-- Join calls via agent-shared link
-- Submit meeting requests
-- Track request status
-- View session history
-
-</td>
-<td width="33%">
-
-### 🔵 Agent
-- Create & manage sessions
-- Share join links with customers
-- Schedule future sessions
-- Send in-app notifications
-- Record calls locally
-
-</td>
-<td width="33%">
-
-### 🔴 Admin
-- Verify & manage agent accounts
-- Approve or reject meeting requests
-- Monitor all live sessions
-- Force-end any active call
-- Send platform-wide notifications
-
-</td>
-</tr>
-</table>
-
----
-
-## 🚀 How to Use
-
-### 1. 🔐 Sign Up / Log In  — `/login`
-
-- **Customer** → register with name, email, password
-- **Agent** → same as above + **Employee ID** (admin must verify before first login)
-- **Admin** → pre-seeded account, no registration needed
-
-After login you are automatically redirected to your role's dashboard.
-
----
-
-### 2. 🖥️ Agent Dashboard — `/dashboard`
-
-<table>
-<tr><td width="30%"><b>📹 New Session</b></td><td>Click to create a session — the join link is instantly copied to your clipboard. Share it with the customer.</td></tr>
-<tr><td><b>🟢 Join Call</b></td><td>Once the customer joins the link, the session turns Active. Click <b>Join Call</b> to enter the live video room.</td></tr>
-<tr><td><b>📅 Schedule</b></td><td>Pick a date, time, and optionally assign a customer. Appears under the Scheduled tab.</td></tr>
-<tr><td><b>🔔 Notify</b></td><td>Send in-app notifications (Info / Success / Warning / Meeting) to selected customers or all at once.</td></tr>
-<tr><td><b>📋 History</b></td><td>All sessions with live status badges — <code>🟡 Waiting</code> → <code>🟢 Active</code> → <code>⚫ Ended</code></td></tr>
-</table>
-
----
-
-### 3. 👤 Customer Portal — `/sessions`
-
-<table>
-<tr><td width="30%"><b>🔗 Join a Meeting</b></td><td>Paste the full link or token your agent sent you → click <b>Join Now</b>.</td></tr>
-<tr><td><b>📅 Schedule a Meeting</b></td><td>Submit a topic, description, and preferred time. The admin reviews and approves/rejects it.</td></tr>
-<tr><td><b>🕐 Request Tracking</b></td><td>Track your submitted requests — <code>🕐 Pending</code> / <code>✅ Approved</code> / <code>❌ Rejected</code></td></tr>
-<tr><td><b>📋 Session History</b></td><td>View all past calls. Active sessions show a <b>Join Call</b> button to re-enter.</td></tr>
-</table>
-
----
-
-### 4. 🎥 Live Video Room — `/session/[id]`
-
-The call interface — available to both agents and customers.
-
-| Button | Action |
-|:---:|:---|
-| 🎤 | Toggle microphone on / off |
-| 📷 | Toggle camera on / off |
-| 💬 | Open / close the side chat panel |
-| ⏺ | Start / stop screen recording — saves as `.webm` locally |
-| 📞 | End call and return to your dashboard |
-| 📋 | Copy room link to share |
-
-> 💡 The **chat panel** supports text messages and file sharing — images, videos, audio, PDFs, and documents. Files are uploaded to storage and broadcast to all participants in real time.
-
----
-
-### 5. 🛡️ Admin Dashboard — `/admin`
-
-| Tab | What you can do |
-|:---:|:---|
-| 📊 **Stats** | Live counts — total customers, agents, active meetings, pending requests |
-| 👤 **Customers** | View all customers, delete accounts |
-| 🔵 **Agents** | Verify pending agents to activate accounts, delete agents, see verified badges |
-| 🔔 **Notifications** | Send messages to All Users / Agents Only / Customers Only |
-| 📅 **Meetings** | Approve or reject meeting requests · Force-end live sessions · View full session history |
-
----
-
-## 🎬 How Video Works — Not P2P
-
-> Atomberg does **not** use peer-to-peer video. All media is server-routed through LiveKit — running entirely on your own infrastructure.
-
-### ❌ Why not P2P?
-
-| Problem | Detail |
-|:---|:---|
-| 🔥 Firewall failures | Direct browser-to-browser connections fail behind corporate NAT |
-| 📈 Doesn't scale | Each new participant multiplies upload streams for every other participant |
-| 🚫 No control | Can't force-end, monitor, or record calls without a server in the middle |
-
-### ✅ How LiveKit SFU works
-
-```
-  Agent Browser  ──▶  LiveKit SFU  ◀──  Customer Browser
-                            │
-              All media routes through the server
-                  (never browser-to-browser)
+Copy the examples and fill in your values:
+```bash
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env.local
 ```
 
-1. Agent creates a session → NestJS backend generates a **signed room token** via LiveKit SDK
-2. Both browsers connect to the LiveKit server using their tokens — **not to each other**
-3. LiveKit **selectively forwards** each participant's stream to all others
-4. When the call ends → backend signals LiveKit to close the room
-
-### P2P vs LiveKit SFU
-
-| Feature | P2P WebRTC | Atomberg (LiveKit) |
-|:---|:---:|:---:|
-| Works behind firewalls | ❌ Often fails | ✅ Always |
-| Admin can force-end a call | ❌ No | ✅ Yes |
-| Scales beyond 2 people | ❌ Poor | ✅ Yes |
-| Media stays in your infra | ❌ No | ✅ Yes |
-| Recording support | ❌ Complex | ✅ Built-in |
-
-> 🔒 Since LiveKit runs in your own Docker container, **no video or audio ever leaves your infrastructure**.
-
 ---
 
-## 🔒 Security
+## Tech Stack
 
-| | Measure |
-|:---:|:---|
-| 🔑 | Passwords hashed with **Bcrypt** (cost factor 10) |
-| 🛡️ | All API routes protected with **JWT** tokens |
-| ⏱️ | Session join tokens expire after **24 hours** |
-| 👁️ | Role-based access — users only see their own data |
-| 🏠 | No third-party video services — LiveKit runs on **your server** |
-
----
-
-## 📁 Project Structure
-
-```
-Atomquest-Final/
-│
-├── frontend/                  ← Next.js application
-│   ├── app/
-│   │   ├── home/              Landing page
-│   │   ├── login/             Authentication
-│   │   ├── dashboard/         Agent dashboard
-│   │   ├── sessions/          Customer portal
-│   │   ├── admin/             Admin dashboard
-│   │   └── session/[id]/      Live video room
-│   └── components/
-│       └── VideoRoom.tsx      LiveKit + Socket.IO integration
-│
-├── backend/                   ← NestJS API
-│   └── src/
-│       ├── auth/              Login & registration
-│       ├── session/           Video session management
-│       ├── chat/              Real-time messaging (Socket.IO)
-│       ├── admin/             Admin controls
-│       ├── notification/      In-app notifications
-│       ├── presence/          Redis-backed user presence
-│       ├── storage/           MinIO file storage
-│       └── metrics/           Prometheus metrics
-│
-├── grafana/                   ← Pre-provisioned dashboards
-├── prometheus/                ← Metrics scrape config
-└── docker-compose.yml         ← Full local stack
-```
+| | Technology | Purpose |
+|---|---|---|
+| 🖥️ | Next.js 14 + React | Frontend UI |
+| ⚙️ | NestJS + TypeScript | Backend REST API |
+| 🎥 | LiveKit SFU | Video & audio routing |
+| 🗄️ | PostgreSQL (Neon) | Database |
+| ⚡ | Redis (Upstash) | Presence & caching |
+| 💬 | Socket.IO | Real-time chat |
+| 📁 | MinIO | File storage |
+| 📊 | Prometheus + Grafana | Metrics |
 
 ---
 
 <div align="center">
 
-**Atomberg v1.0** &nbsp;·&nbsp; Built for AtomQuest Hackathon &nbsp;·&nbsp; ![Made with TypeScript](https://img.shields.io/badge/Made%20with-TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)
+**Atomberg** · Built for AtomQuest Hackathon · Self-hosted · Open Infrastructure
 
 </div>
