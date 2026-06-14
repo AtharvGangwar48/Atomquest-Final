@@ -60,6 +60,8 @@ export class SessionService {
       session.customerId = userId;
       session.status = 'active';
       await this.sessionRepo.save(session);
+    } else if (decoded.role === 'customer' && session.customerId !== userId) {
+      throw new ForbiddenException('Session is already taken by another customer');
     }
 
     const livekitToken = await this.livekitService.generateToken(

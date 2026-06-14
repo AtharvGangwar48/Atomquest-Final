@@ -8,9 +8,11 @@ export class LivekitService {
   private wsUrl = process.env.LIVEKIT_WS_URL || 'ws://localhost:7880';
 
   async generateToken(roomName: string, participantName: string, metadata?: string) {
-    console.log('Generating token with:', { apiKey: this.apiKey, apiSecret: this.apiSecret });
-    if (!this.apiKey || !this.apiSecret) {
-      throw new Error('LiveKit credentials missing!');
+    const key = this.apiKey;
+    const secret = this.apiSecret;
+    console.log('[LiveKit] apiKey:', key?.substring(0, 8), '| wsUrl:', this.wsUrl);
+    if (!key || !secret || key === 'devkey') {
+      throw new Error(`LiveKit credentials missing or still using devkey. Set LIVEKIT_API_KEY on Render.`);
     }
     const identity = `${participantName}-${Math.random().toString(36).substr(2, 9)}`;
     const at = new AccessToken(this.apiKey, this.apiSecret, {
