@@ -8,7 +8,7 @@ if (typeof window !== 'undefined') {
 
 const api = axios.create({
   baseURL: API_URL,
-  timeout: 15000,
+  timeout: 55000, // 55s — Render free tier cold start can take ~50s
 });
 
 api.interceptors.request.use((config) => {

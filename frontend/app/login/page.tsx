@@ -129,6 +129,14 @@ function LoginContent() {
             {isLogin ? 'Sign in to your Atomberg account' : 'Join Atomberg as a customer or agent'}
           </p>
 
+          {/* Render warning */}
+          <div className="mb-6 flex items-start gap-2.5 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+            <span className="text-amber-500 text-lg shrink-0">⚠️</span>
+            <p className="text-xs text-amber-700 leading-relaxed">
+              <span className="font-semibold">Backend is deployed on Render free tier.</span> First request may take up to 50 seconds to wake up. Please wait after clicking Sign In.
+            </p>
+          </div>
+
           {/* Tabs */}
           <div className="flex gap-1 mb-6 bg-gray-100 p-1 rounded-xl">
             {['Login', 'Register'].map((label) => {
@@ -228,7 +236,7 @@ function LoginContent() {
               <p className="text-xs text-gray-400 font-semibold uppercase tracking-wider mb-3">Demo Credentials</p>
               <div className="space-y-2">
                 {[
-                  { label: '🔴 Admin', email: 'admin-vcp@atomquest.com', password: 'Admin123' },
+                  { label: '🔴 Admin', email: 'admin-vcp@atomquest.com', password: 'admin123' },
                   { label: '🔵 Agent', email: 'agent@demo.com', password: 'password123' },
                   { label: '🟢 Customer', email: 'customer@demo.com', password: 'password123' },
                 ].map(({ label, email, password }) => (
