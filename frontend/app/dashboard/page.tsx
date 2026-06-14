@@ -70,12 +70,12 @@ export default function Dashboard() {
       const { data } = await api.post('/sessions');
       const url = `${window.location.origin}/session/join?token=${data.joinToken}`;
       navigator.clipboard.writeText(url);
-      setCopied('new');
-      setTimeout(() => setCopied(null), 2000);
-      await loadSessions();
+      // Go directly into the session — agent joining makes it active
+      router.push(`/session/${data.sessionId}`);
     } catch (err: any) {
       alert(err.response?.data?.message || 'Failed to create session');
-    } finally { setCreating(false); }
+      setCreating(false);
+    }
   };
 
   const copyLink = (token: string) => {
@@ -165,7 +165,7 @@ export default function Dashboard() {
                 className="flex items-center gap-2 bg-white text-blue-700 font-bold px-5 py-3 rounded-xl hover:bg-blue-50 transition disabled:opacity-60 shadow-md"
               >
                 {creating ? <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" /> : <Plus className="w-4 h-4" />}
-                {copied === 'new' ? 'Link Copied!' : creating ? 'Creating...' : 'New Session'}
+                {creating ? 'Creating...' : 'New Session'}
               </button>
               <button
                 onClick={() => setShowSchedule(true)}
