@@ -100,6 +100,34 @@ Admin sending notifications — broadcast to all users, agents only, or customer
 
 ---
 
+### 🎥 Video Call Room
+
+![Video Chat](images/Video%20Chat.png)
+
+Live video call room — agent and customer connected via LiveKit SFU. Camera, mic controls, chat, recording, and share room link all available.
+
+![Video Chat All Options](images/Video%20chat%20all%20options.png)
+
+Full control bar — microphone toggle, camera toggle, chat panel, screen recording (⏺), and end call button.
+
+![In-call Chat](images/message%20chage%20in%20video%20call.png)
+
+In-call chat panel — real-time messaging with file sharing (images, video, audio, PDF) while on a live video call.
+
+![Screen Recording](images/Record%20entire%20screen%20for%20meeting%20recording%20downloadable%20file.png)
+
+Screen recording — browser-native MediaRecorder captures the screen and auto-downloads as a `.webm` file. No server cost, completely free.
+
+---
+
+### 🏗️ System Design
+
+![System Design](images/System%20design%20.png)
+
+System architecture — how frontend, backend, LiveKit SFU, PostgreSQL, Redis, and MinIO interact with each other.
+
+---
+
 ## How It Works
 
 ```
