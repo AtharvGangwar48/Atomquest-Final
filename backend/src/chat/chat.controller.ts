@@ -26,9 +26,17 @@ export class ChatController {
     @UploadedFile() file: Express.Multer.File,
     @Req() req,
   ) {
-    const ext = path.extname(file.originalname);
-    const objectName = `files/${sessionId}/${Date.now()}${ext}`;
-    const fileUrl = await this.storageService.upload(objectName, file.buffer, file.mimetype);
+    let fileUrl: string;
+
+    try {
+      const ext = path.extname(file.originalname);
+      const objectName = `files/${sessionId}/${Date.now()}${ext}`;
+      fileUrl = await this.storageService.upload(objectName, file.buffer, file.mimetype);
+    } catch (err) {
+      // MinIO unavailable (e.g. Render deploy) — fall back to base64 data URL
+      const base64 = file.buffer.toString('base64');
+      fileUrl = `data:${file.mimetype};base64,${base64}`;
+    }
 
     const message = await this.chatService.saveMessage(
       sessionId,

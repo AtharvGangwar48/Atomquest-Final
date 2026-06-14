@@ -27,7 +27,7 @@ export class ChatMessage {
   @Column({ type: 'enum', enum: ['text', 'file'], default: 'text' })
   type: 'text' | 'file';
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, type: 'text' })
   fileUrl: string;
 
   @Column({ nullable: true })

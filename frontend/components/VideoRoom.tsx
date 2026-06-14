@@ -419,6 +419,10 @@ export default function VideoRoom({ roomData, sessionId, onEndCall }: VideoRoomP
   };
 
   const handleFileUpload = async (file: File) => {
+    if (file.size > 5 * 1024 * 1024) {
+      alert('File too large. Maximum size is 5MB.');
+      return;
+    }
     setUploading(true);
     try {
       const formData = new FormData();
