@@ -1,6 +1,6 @@
 <div align="center">
 
-# Atomberg
+# Atomquest Final
 ### Personalized Video Chat Service
 
 A self-hosted video calling platform for customer support — agents create sessions, customers join via link, admins manage everything.
