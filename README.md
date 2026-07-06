@@ -16,7 +16,7 @@ A self-hosted video calling platform for customer support — agents create sess
 
 ---
 
-## What is Atomberg?
+## What is Personalized Video Chat Service?
 
 Atomberg is a **self-hosted video customer support platform**. Instead of peer-to-peer video (which fails behind firewalls), all media is routed through a **LiveKit SFU server** running on your own infrastructure — no third-party video service involved, All Device Support (Laptop, Mobile, Desktop, Tablets, etc).
 
